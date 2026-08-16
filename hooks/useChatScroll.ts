@@ -2,13 +2,14 @@
 
 import { useEffect, useRef } from "react";
 
-export function useChatScroll(deps: unknown[]) {
-  const ref = useRef<HTMLDivElement>(null);
+export function useChatScroll(dependency: any[]) {
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    ref.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, deps);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, dependency);
 
-  return ref;
+  return scrollRef;
 }
