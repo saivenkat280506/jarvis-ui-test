@@ -1,6 +1,6 @@
 # Jarvis UI test
 
-Design sandbox on the Desktop. **Do not edit the live UI in `Desktop/JARVIS` until a design is chosen.**
+Light desktop **Consciousness Interface** sandbox. The live assistant stays in `Desktop/JARVIS` until this design is signed off.
 
 ## Run
 
@@ -13,12 +13,20 @@ Open **http://127.0.0.1:3001** (port **3001** so it does not clash with live Jar
 
 The live backend can stay at **http://127.0.0.1:8000**. This app does not start Python.
 
-## Stack (matches live Jarvis)
+## What this is
+
+- Light chrome around the **exact ice orb** from [Jarvis-chat](https://github.com/saivenkat280506/Jarvis-chat.git)
+- Left rail: orb + Router / Mode / Voice / Latency
+- Right: chat, live stream, voice trigger, mute, refresh
+- **Focus** collapses to the orb window; **Console** is the split desktop
+- **Preview** chips cycle Standby / Listen / Think / Speak without waiting on the backend
+
+## Stack
 
 - Next.js 16 + React 19 + TypeScript
 - Tailwind CSS 4
-- `lucide-react`, `motion`, `clsx`, `tailwind-merge`, `class-variance-authority`
-- Path alias `@/*`
+- Three.js + `@react-three/fiber` + `@react-three/drei` (orb)
+- `motion`, `lucide-react`
 
 ## Later: move into live Jarvis
 
