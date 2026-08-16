@@ -11,15 +11,15 @@ npm run dev
 
 Open **http://127.0.0.1:3001** (port **3001** so it does not clash with live Jarvis on 3000).
 
-The live backend can stay at **http://127.0.0.1:8000**. This app does not start Python.
+This sandbox is **UI only**. Chat, mic, and orb states are local previews. No Python backend is required.
 
 ## What this is
 
-- Light chrome around the **exact ice orb** from [Jarvis-chat](https://github.com/saivenkat280506/Jarvis-chat.git)
+- Light chrome around the **ice orb** from [Jarvis-chat](https://github.com/saivenkat280506/Jarvis-chat.git)
 - Left rail: orb + Router / Mode / Voice / Latency
-- Right: chat, live stream, voice trigger, mute, refresh
+- Right: chat, streamed reply preview, voice demo, mute, refresh
 - **Focus** collapses to the orb window; **Console** is the split desktop
-- **Preview** chips cycle Standby / Listen / Think / Speak without waiting on the backend
+- **Preview** chips cycle Standby / Listen / Think / Speak
 
 ## Stack
 

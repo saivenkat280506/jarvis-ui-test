@@ -207,6 +207,7 @@ export default function CrystalOrbHud({ state }: { state: OrbVisualState }) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={config.label}
+                data-testid="orb-label"
                 initial={{ opacity: 0, scale: 0.9, y: 10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.96, y: -6 }}

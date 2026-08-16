@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     root: path.resolve("."),
   },
   allowedDevOrigins: ["127.0.0.1", "localhost"],
+  devIndicators: {
+    position: "bottom-right",
+  },
 };
 
 export default nextConfig;

@@ -12,12 +12,22 @@ export default function JarvisShell() {
   const jarvis = useJarvis();
   const [layout, setLayout] = useState<"console" | "focus">("console");
 
+  const [preview, setPreview] = useState<OrbVisualState | null>(null);
+
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("view") === "focus") {
-      setLayout("focus");
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("view") === "focus") setLayout("focus");
+    const nextPreview = params.get("preview");
+    if (
+      nextPreview === "idle" ||
+      nextPreview === "listening" ||
+      nextPreview === "thinking" ||
+      nextPreview === "talking" ||
+      nextPreview === "offline"
+    ) {
+      setPreview(nextPreview);
     }
   }, []);
-  const [preview, setPreview] = useState<OrbVisualState | null>(null);
 
   const liveOrb = mapAgentToOrb(jarvis.agentState, Boolean(jarvis.streamText));
   const orbState = preview ?? liveOrb;
@@ -27,11 +37,7 @@ export default function JarvisShell() {
     return orbState.toUpperCase();
   }, [orbState]);
 
-  const latencyLabel = jarvis.streamText
-    ? "Paced stream"
-    : jarvis.latency != null
-      ? `${jarvis.latency} ms`
-      : "Live stream";
+  const latencyLabel = jarvis.streamText ? "Paced stream" : "Live stream";
 
   return (
     <div className="relative h-screen w-full overflow-hidden text-slate-900">
@@ -82,7 +88,6 @@ export default function JarvisShell() {
             isListening={jarvis.isListening}
             isThinking={jarvis.isProcessing || jarvis.agentState === "thinking"}
             isMuted={jarvis.isMuted}
-            isOnline={jarvis.isOnline}
             streamModel={jarvis.streamModel}
           />
         )}

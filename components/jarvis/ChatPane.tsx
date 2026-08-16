@@ -34,7 +34,6 @@ type ChatPaneProps = {
   isListening: boolean;
   isThinking: boolean;
   isMuted: boolean;
-  isOnline: boolean;
   streamModel: string;
 };
 
@@ -51,7 +50,6 @@ export default function ChatPane({
   isListening,
   isThinking,
   isMuted,
-  isOnline,
   streamModel,
 }: ChatPaneProps) {
   const chatRef = useChatScroll([messages, streamText, transcript]);
@@ -63,6 +61,7 @@ export default function ChatPane({
         <div className="title-no-drag flex items-center gap-2">
           <button
             type="button"
+            data-testid="refresh-chat"
             onClick={clearChat}
             className="group flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-50"
           >
@@ -71,6 +70,7 @@ export default function ChatPane({
           </button>
           <button
             type="button"
+            data-testid="toggle-mute"
             onClick={toggleMute}
             className={cn(
               "flex items-center gap-2 rounded-full border px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest transition",
@@ -188,19 +188,17 @@ export default function ChatPane({
               </label>
               <input
                 id="jarvis-message"
+                data-testid="chat-input"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                placeholder={
-                  isOnline
-                    ? "Ask for a search, a command, or a deep explanation..."
-                    : "Backend offline — design preview still works"
-                }
+                placeholder="Ask for a search, a command, or a deep explanation..."
                 className="h-12 flex-1 rounded-2xl border border-slate-200 bg-slate-50/70 px-4 text-[15px] text-slate-900 outline-none placeholder:text-slate-400 focus:border-cyan-300 focus:bg-white"
               />
 
               <button
                 type="button"
+                data-testid="toggle-mic"
                 onClick={toggleMic}
                 aria-label={isListening ? "Stop voice" : "Start voice"}
                 className={cn(
@@ -217,6 +215,7 @@ export default function ChatPane({
 
               <button
                 type="button"
+                data-testid="send-message"
                 onClick={() => sendMessage()}
                 disabled={!input.trim() || isThinking}
                 aria-label="Send message"
@@ -269,12 +268,10 @@ export default function ChatPane({
               <span
                 className={cn(
                   "inline-block h-2 w-2 rounded-full",
-                  isOnline
-                    ? "bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]"
-                    : "bg-rose-400",
+                  "bg-cyan-500 shadow-[0_0_8px_rgba(6,182,212,0.8)]"
                 )}
               />
-              {isOnline ? `${activeModel.label} active` : "Core offline"}
+              UI preview · {activeModel.label}
             </span>
           </div>
         </div>

@@ -66,11 +66,30 @@ export default function ConsciousnessRail({
           <h1 className="mt-2 text-2xl font-semibold tracking-tight text-slate-900">
             Consciousness Interface
           </h1>
+          <div className="mt-3 flex flex-wrap items-center gap-1.5">
+            {PREVIEW_STATES.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                data-testid={`preview-${item.id}`}
+                onClick={() => onPreview(preview === item.id ? null : item.id)}
+                className={cn(
+                  "rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider transition",
+                  preview === item.id
+                    ? "border-cyan-400 bg-cyan-50 text-cyan-800"
+                    : "border-slate-200 bg-white/70 text-slate-500 hover:border-cyan-200 hover:text-cyan-700",
+                )}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
         </div>
         {onToggleLayout && (
           <button
             type="button"
             onClick={onToggleLayout}
+            data-testid="layout-toggle"
             className="mt-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500 hover:border-cyan-200 hover:text-cyan-700"
             aria-label={compact ? "Open console" : "Orb focus"}
           >
@@ -115,26 +134,6 @@ export default function ConsciousnessRail({
         />
       </div>
 
-      <div className="mt-4 mb-2 flex flex-wrap items-center gap-1.5 pl-12">
-        <span className="mr-1 font-[family-name:var(--font-mono)] text-[9px] uppercase tracking-[0.22em] text-slate-400">
-          Preview
-        </span>
-        {PREVIEW_STATES.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onPreview(preview === item.id ? null : item.id)}
-            className={cn(
-              "rounded-full border px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider transition",
-              preview === item.id
-                ? "border-cyan-400 bg-cyan-50 text-cyan-800"
-                : "border-slate-200 bg-white/70 text-slate-500 hover:border-cyan-200 hover:text-cyan-700",
-            )}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
     </aside>
   );
 }
