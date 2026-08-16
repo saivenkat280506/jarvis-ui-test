@@ -1,7 +1,5 @@
 "use client";
-// Modern J.A.R.V.I.S UI Rebuild Trigger
 
-import { useEffect } from "react";
 import TopBar from "@/components/TopBar";
 import LeftPanel from "@/components/LeftPanel";
 import ChatArea from "@/components/ChatArea";
@@ -9,24 +7,19 @@ import QuickActions from "@/components/QuickActions";
 import AgentStepTracker from "@/components/AgentStepTracker";
 import SettingsSheet from "@/components/SettingsSheet";
 import { useJarvis } from "@/hooks/useJarvis";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function JarvisWorkspace() {
   const jarvis = useJarvis();
-
-  // Sandbox stays light so we can judge the current layout + ice orb.
-  // Live Desktop/JARVIS still owns the real theme setting.
-  useEffect(() => {
-    document.documentElement.classList.remove("dark");
-  }, []);
+  const { theme, setTheme, toggleTheme } = useTheme();
 
   return (
-    <main className="relative flex h-screen w-screen bg-background overflow-hidden p-4 gap-4">
-      {/* Texture Layer */}
+    <main className="relative flex h-screen w-screen overflow-hidden bg-background p-4 gap-4">
+      <div className="grid-veil absolute inset-0" />
       <div className="noise" />
 
-      {/* LEFT PANEL - Glassy & Floating */}
-      <LeftPanel 
-        agentState={jarvis.agentState} 
+      <LeftPanel
+        agentState={jarvis.agentState}
         isListening={jarvis.isListening}
         isBackendOnline={jarvis.isBackendOnline}
         toggleMic={jarvis.toggleMic}
@@ -34,24 +27,25 @@ export default function JarvisWorkspace() {
         onSettingsClick={() => jarvis.setSettingsOpen(true)}
       />
 
-      {/* MAIN WORKSPACE - Unified Chat & Actions */}
-      <div className="relative flex flex-col flex-1 gap-4 min-w-0">
-        <TopBar 
-          onSettingsClick={() => jarvis.setSettingsOpen(true)} 
+      <div className="relative flex min-w-0 flex-1 flex-col gap-4">
+        <TopBar
+          onSettingsClick={() => jarvis.setSettingsOpen(true)}
           onRefreshChat={jarvis.clearChat}
           backendStatus={jarvis.backendStatus}
           backendLatency={jarvis.backendLatency}
+          theme={theme}
+          onToggleTheme={toggleTheme}
         />
-        
-        <div className="flex-1 flex gap-4 min-h-0">
-          <div className="flex-1 flex flex-col glass rounded-3xl overflow-hidden shadow-sm">
-            <QuickActions 
-              onSendMessage={jarvis.sendMessage} 
-              onClearChat={jarvis.clearChat} 
+
+        <div className="flex min-h-0 flex-1 gap-4">
+          <div className="glass flex min-h-0 flex-1 flex-col overflow-hidden rounded-3xl">
+            <QuickActions
+              onSendMessage={jarvis.sendMessage}
+              onClearChat={jarvis.clearChat}
             />
             <AgentStepTracker logs={jarvis.actionLogs} />
-            <ChatArea 
-              messages={jarvis.messages} 
+            <ChatArea
+              messages={jarvis.messages}
               inputText={jarvis.inputText}
               setInputText={jarvis.setInputText}
               sendMessage={jarvis.sendMessage}
@@ -65,11 +59,12 @@ export default function JarvisWorkspace() {
         </div>
       </div>
 
-      <SettingsSheet 
-        open={jarvis.settingsOpen} 
-        onOpenChange={jarvis.setSettingsOpen} 
+      <SettingsSheet
+        open={jarvis.settingsOpen}
+        onOpenChange={jarvis.setSettingsOpen}
+        theme={theme}
+        onThemeChange={setTheme}
       />
-
     </main>
   );
 }

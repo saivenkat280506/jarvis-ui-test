@@ -115,8 +115,8 @@ export default function ChatArea({
                     className={cn(
                       "font-inter leading-relaxed text-[14px] shadow-sm",
                       msg.role === "assistant" 
-                        ? "rounded-2xl rounded-bl-none bg-white/80 dark:bg-zinc-900/80 border border-white/40 dark:border-zinc-700/40" 
-                        : "rounded-2xl rounded-br-none bg-primary text-primary-foreground dark:bg-sky-950/40 dark:text-cyan-100 dark:border dark:border-cyan-500/30"
+                        ? "rounded-2xl rounded-bl-none bg-white/90 dark:bg-cyan-950/25 border border-cyan-100/80 dark:border-cyan-500/20" 
+                        : "rounded-2xl rounded-br-none bg-slate-900 text-slate-50 dark:bg-cyan-950/50 dark:text-cyan-50 dark:border dark:border-cyan-400/25"
                     )}
                   >
                     {msg.isStreaming && msg.role === "assistant" ? (
@@ -211,7 +211,7 @@ export default function ChatArea({
               <Button 
                 onClick={() => sendMessage(inputText)}
                 disabled={isOffline || !inputText.trim()}
-                className="bg-primary text-primary-foreground rounded-full h-10 w-10 p-0 shadow-lg hover:bg-zinc-800 dark:hover:bg-zinc-700 disabled:opacity-30 disabled:hover:bg-primary transition-all active:scale-95"
+                className="bg-primary text-primary-foreground rounded-full h-10 w-10 p-0 shadow-lg hover:bg-cyan-800 dark:hover:bg-cyan-300 disabled:opacity-30 disabled:hover:bg-primary transition-all active:scale-95"
               >
                 <SendHorizontal className="w-5 h-5" />
               </Button>

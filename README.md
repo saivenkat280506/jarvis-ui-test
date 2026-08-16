@@ -5,7 +5,8 @@ Design sandbox on the Desktop. **Do not edit the live UI in `Desktop/JARVIS` unt
 This folder now holds a **copy of the current Jarvis desktop UI** with:
 
 - the ice orb from Jarvis-chat
-- Outfit + Orbitron + JetBrains fonts from the new design
+- Outfit + Orbitron + JetBrains fonts
+- Light and dark themes (moon/sun in the top bar, or `?theme=dark`)
 
 ## Run
 

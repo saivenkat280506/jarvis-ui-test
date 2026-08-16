@@ -45,10 +45,11 @@ export default function LeftPanel({
   const isActive = !isOffline && agentState !== "idle";
 
   const waveformData = isActive
-    ? Array.from({ length: 40 }, () => {
-        const base = agentState === "talking" ? 0.6 : 0.3;
-        const variance = agentState === "talking" ? 0.4 : 0.2;
-        return Math.random() * variance + base;
+    ? Array.from({ length: 40 }, (_, i) => {
+        const base = agentState === "talking" ? 0.58 : 0.32;
+        const variance = agentState === "talking" ? 0.36 : 0.18;
+        const wave = Math.abs(Math.sin(i * 0.55 + (agentState === "talking" ? 1.2 : 0.4)));
+        return base + variance * wave;
       })
     : [];
 
@@ -122,7 +123,7 @@ export default function LeftPanel({
             fadeEdges={true}
             height={40}
             className="w-full h-full opacity-60"
-            barColor={isDark ? "#3a6a9e" : "#5C84B1"}
+            barColor={isDark ? "#22d3ee" : "#0e7490"}
           />
         </div>
       </div>
@@ -146,7 +147,7 @@ export default function LeftPanel({
 
         {(() => {
           const stateConfig = {
-            idle: { label: "Voice Mode", color: "bg-primary hover:bg-zinc-800", icon: Mic },
+            idle: { label: "Voice Mode", color: "bg-primary hover:bg-cyan-800 dark:hover:bg-cyan-300", icon: Mic },
             idle_listening: { label: "On Call", color: "bg-emerald-600 hover:bg-emerald-700", icon: Mic },
             listening: { label: "Listening", color: "bg-emerald-500 hover:bg-emerald-600 animate-pulse", icon: Mic },
             transcribing: { label: "Transcribing", color: "bg-purple-500 hover:bg-purple-600", icon: Zap },
@@ -164,8 +165,8 @@ export default function LeftPanel({
               onClick={toggleMic}
               disabled={isOffline}
               className={cn(
-                "w-full h-14 rounded-2xl transition-all duration-500 gap-3 border-none shadow-md text-primary-foreground font-medium",
-                inSession || isOffline ? config.color : "bg-primary hover:bg-zinc-800 dark:hover:bg-zinc-700",
+                "w-full h-14 rounded-2xl transition-all duration-500 gap-3 border-none shadow-md font-medium text-white dark:text-slate-950",
+                inSession || isOffline ? config.color : "bg-primary hover:bg-cyan-800 dark:hover:bg-cyan-300",
                 isOffline && "opacity-80 cursor-not-allowed"
               )}
             >

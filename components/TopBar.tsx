@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Settings2, Globe, RotateCcw, Wifi, WifiOff, Loader2 } from "lucide-react";
+import { Settings2, Globe, RotateCcw, Wifi, WifiOff, Loader2, Moon, Sun } from "lucide-react";
+import type { Theme } from "@/hooks/useTheme";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -14,6 +15,8 @@ interface TopBarProps {
   onRefreshChat: () => void;
   backendStatus?: BackendStatus;
   backendLatency?: number | null;
+  theme?: Theme;
+  onToggleTheme?: () => void;
 }
 
 /* Shared icon-button class — applied directly to native <button> elements */
@@ -25,6 +28,8 @@ export default function TopBar({
   onRefreshChat,
   backendStatus: backendStatusProp,
   backendLatency: backendLatencyProp,
+  theme = "light",
+  onToggleTheme,
 }: TopBarProps) {
   const polled = useBackendStatus(backendStatusProp ? 60000 : 5000);
   const status = backendStatusProp ?? polled.status;
@@ -103,7 +108,21 @@ export default function TopBar({
           </div>
         </div>
 
-        {/* ── Settings button — plain <button>, no nesting ── */}
+        <button
+          type="button"
+          onClick={onToggleTheme}
+          className={iconBtn}
+          title={theme === "dark" ? "Switch to light" : "Switch to dark"}
+          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
+          data-testid="theme-toggle"
+        >
+          {theme === "dark" ? (
+            <Sun className="w-4 h-4 text-cyan-200" />
+          ) : (
+            <Moon className="w-4 h-4 text-cyan-800" />
+          )}
+        </button>
+
         <button
           onClick={onSettingsClick}
           className={iconBtn}

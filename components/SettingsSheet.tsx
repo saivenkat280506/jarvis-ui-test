@@ -22,6 +22,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Separator } from "@/components/ui/separator";
 import { useState, useEffect, useCallback, useRef } from "react";
+import type { Theme } from "@/hooks/useTheme";
 
 const BACKEND = "http://127.0.0.1:8000";
 
@@ -46,9 +47,16 @@ const DEFAULTS: Settings = {
 interface SettingsSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  theme?: Theme;
+  onThemeChange?: (theme: Theme) => void;
 }
 
-export default function SettingsSheet({ open, onOpenChange }: SettingsSheetProps) {
+export default function SettingsSheet({
+  open,
+  onOpenChange,
+  theme,
+  onThemeChange,
+}: SettingsSheetProps) {
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -61,28 +69,21 @@ export default function SettingsSheet({ open, onOpenChange }: SettingsSheetProps
     fetch(`${BACKEND}/settings`)
       .then((r) => r.json())
       .then((data) => {
-        setSettings({ ...DEFAULTS, ...data });
-        if (data.theme === "dark") {
-          document.documentElement.classList.add("dark");
-        } else {
-          document.documentElement.classList.remove("dark");
-        }
+        const next = { ...DEFAULTS, ...data };
+        if (theme) next.theme = theme;
+        setSettings(next);
       })
       .catch(() => {/* keep defaults on error */})
       .finally(() => setLoading(false));
   }, [open]);
 
-  /* ── Update DOM theme class when settings.theme changes ── */
   useEffect(() => {
-    if (settings.theme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [settings.theme]);
+    if (theme) setSettings((prev) => ({ ...prev, theme }));
+  }, [theme]);
 
   /* ── Debounced save to backend ── */
   const persist = useCallback((patch: Partial<Settings>) => {
+    if (patch.theme && onThemeChange) onThemeChange(patch.theme);
     setSettings((prev) => {
       const next = { ...prev, ...patch };
       if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -99,7 +100,7 @@ export default function SettingsSheet({ open, onOpenChange }: SettingsSheetProps
       }, 500);
       return next;
     });
-  }, []);
+  }, [onThemeChange]);
 
   const s = settings;
 
