@@ -10,35 +10,35 @@ interface QuickActionsProps {
 export default function QuickActions({ onSendMessage, onClearChat }: QuickActionsProps) {
   const actions = [
     {
-      label: "Introduce Yourself",
+      label: "Introduce",
       icon: MessageSquareDashed,
       action: () => onSendMessage("Hello Jarvis, introduce yourself in one short sentence."),
       color: "text-blue-500 dark:text-blue-400",
       bg: "bg-blue-50 dark:bg-blue-950/40",
     },
     {
-      label: "What Time Is It?",
+      label: "Time",
       icon: Cpu,
       action: () => onSendMessage("What time is it right now?"),
       color: "text-emerald-500 dark:text-emerald-400",
       bg: "bg-emerald-50 dark:bg-emerald-950/40",
     },
     {
-      label: "Open Notepad",
+      label: "Notepad",
       icon: Zap,
       action: () => onSendMessage("Open notepad."),
       color: "text-violet-500 dark:text-violet-400",
       bg: "bg-violet-50 dark:bg-violet-950/40",
     },
     {
-      label: "Tell a Joke",
+      label: "Joke",
       icon: ShieldAlert,
       action: () => onSendMessage("Tell me a short witty joke."),
       color: "text-amber-500 dark:text-amber-400",
       bg: "bg-amber-50 dark:bg-amber-950/40",
     },
     {
-      label: "Clear Chat",
+      label: "Clear",
       icon: Trash2,
       action: onClearChat,
       color: "text-rose-500 dark:text-rose-400",
@@ -47,27 +47,27 @@ export default function QuickActions({ onSendMessage, onClearChat }: QuickAction
   ];
 
   return (
-    <div className="bg-white/40 dark:bg-zinc-900/40 border-b border-border/20 px-6 py-4 backdrop-blur-sm flex-shrink-0">
-      <div className="flex items-center gap-2 mb-3">
-        <Zap className="w-3.5 h-3.5 text-muted-foreground" />
-        <span className="text-[10px] font-bold tracking-[0.2em] text-muted-foreground uppercase mt-0.5">
-          Suggested Actions
+    <div className="w-full flex-shrink-0 border-b border-border/20 bg-white/40 px-3 py-3 backdrop-blur-sm dark:bg-zinc-900/40">
+      <div className="mb-2 flex items-center gap-2">
+        <Zap className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+        <span className="text-[10px] font-bold tracking-[0.18em] text-muted-foreground uppercase">
+          Suggested
         </span>
       </div>
 
-      <div className="flex gap-3 overflow-x-auto pb-1 scrollbar-hide">
-        {actions.map((act, idx) => {
+      <div className="grid w-full grid-cols-2 gap-2">
+        {actions.map((act) => {
           const Icon = act.icon;
           return (
             <button
-              key={idx}
+              key={act.label}
               onClick={act.action}
-              className="group flex-shrink-0 flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-white/50 dark:bg-zinc-800/50 border border-white/80 dark:border-zinc-700/80 shadow-sm hover:bg-white dark:hover:bg-zinc-800 hover:shadow-md transition-all active:scale-95 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+              className="flex min-w-0 items-center gap-2 rounded-xl border border-white/80 bg-white/50 px-2 py-1.5 text-left shadow-sm outline-none transition-all hover:bg-white hover:shadow-md focus-visible:ring-2 focus-visible:ring-primary/40 active:scale-[0.98] dark:border-zinc-700/80 dark:bg-zinc-800/50 dark:hover:bg-zinc-800"
             >
-              <div className={`p-1 rounded-md ${act.bg} transition-colors group-hover:bg-opacity-80`}>
-                <Icon className={`w-3.5 h-3.5 ${act.color}`} />
+              <div className={`shrink-0 rounded-md p-1 ${act.bg}`}>
+                <Icon className={`h-3.5 w-3.5 ${act.color}`} />
               </div>
-              <span className="text-[11px] font-medium text-zinc-700 dark:text-zinc-300 leading-tight">
+              <span className="truncate text-[11px] font-medium leading-tight text-zinc-700 dark:text-zinc-300">
                 {act.label}
               </span>
             </button>

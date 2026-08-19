@@ -10,7 +10,7 @@ import {
   TranscriptViewerScrubBar,
   TranscriptViewerWords,
 } from "@/components/ui/transcript-viewer";
-import { SendHorizontal, Mic, FileUp, PauseIcon, PlayIcon } from "lucide-react";
+import { SendHorizontal, PauseIcon, PlayIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import SearchBriefing, { SearchBriefingData } from "@/components/SearchBriefing";
@@ -48,7 +48,6 @@ export default function ChatArea({
   speechTranscript,
   agentState,
   isBackendOnline = true,
-  toggleMic
 }: ChatAreaProps) {
   const scrollRef = useChatScroll([messages, streamingText, speechTranscript]);
   const isOffline = agentState === "offline" || !isBackendOnline;
@@ -56,18 +55,18 @@ export default function ChatArea({
   return (
     <div className="flex flex-col flex-1 min-h-0 bg-transparent">
       {isOffline && (
-        <div className="mx-6 mt-3 px-4 py-2 rounded-2xl border border-red-200/70 dark:border-red-900/50 bg-red-50/70 dark:bg-red-950/30 text-red-600 dark:text-red-300 text-[11px] font-jetbrains text-center">
+        <div className="mx-3 mt-3 rounded-2xl border border-red-200/70 bg-red-50/70 px-3 py-2 text-center font-jetbrains text-[11px] text-red-600 dark:border-red-900/50 dark:bg-red-950/30 dark:text-red-300">
           Backend offline — Jarvis cannot listen, speak, or run tasks until the server is back.
         </div>
       )}
       {/* MESSAGES VIEWPORT */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-6 py-4 space-y-6 scrollbar-hide"
+        className="min-h-0 flex-1 space-y-4 overflow-y-auto px-3 py-3 scrollbar-hide"
       >
         <div className="flex flex-col gap-1 pb-4">
-          <div className="flex items-center gap-2 px-2 py-4">
-            <span className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">Conversation Log</span>
+          <div className="flex items-center gap-2 px-0 py-2">
+            <span className="text-[10px] font-bold tracking-widest text-muted-foreground/60 uppercase">Log</span>
             <div className="flex-1 h-px bg-border/40" />
           </div>
 
@@ -80,7 +79,7 @@ export default function ChatArea({
                 {msg.role === "assistant" && (
                   <MessageAvatar 
                     name="JV" 
-                    className="self-end mb-1 bg-white dark:bg-zinc-800 shadow-sm ring-white dark:ring-zinc-700 ring-offset-1 ring-1" 
+                    className="mb-1 hidden self-end bg-white shadow-sm ring-1 ring-white ring-offset-1 dark:bg-zinc-800 dark:ring-zinc-700" 
                   />
                 )}
                 
@@ -161,66 +160,33 @@ export default function ChatArea({
       </div>
 
       {/* INPUT AREA - High Fidelity Floating Design */}
-      <div className="px-6 pb-6 pt-2">
-        {/* Status Indicator (Minimal) */}
+      <div className="w-full shrink-0 px-3 pb-3 pt-2">
         {agentState === "listening" && !speechTranscript && (
-          <div className="mb-3 px-4 py-1.5 bg-primary/5 border border-primary/10 rounded-full w-fit mx-auto animate-in fade-in slide-in-from-bottom-2">
-             <div className="flex items-center gap-2">
-                <div className="flex gap-1">
-                  <span className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:-0.3s]" />
-                  <span className="w-1 h-1 rounded-full bg-primary animate-bounce [animation-delay:-0.15s]" />
-                  <span className="w-1 h-1 rounded-full bg-primary animate-bounce" />
-                </div>
-                <span className="text-[11px] text-primary/60 font-medium uppercase tracking-tighter">Listening</span>
-             </div>
+          <div className="mx-auto mb-2 w-fit rounded-full border border-primary/10 bg-primary/5 px-3 py-1 animate-in fade-in slide-in-from-bottom-2">
+            <span className="text-[10px] font-medium tracking-tight text-primary/70 uppercase">
+              Listening
+            </span>
           </div>
         )}
 
-        <div className="relative group glass-input">
-          <div className="bg-white/60 dark:bg-zinc-900/60 border border-white/40 dark:border-zinc-700/40 shadow-xl rounded-[24px] p-2 flex items-center transition-all duration-300 focus-within:bg-white dark:focus-within:bg-zinc-900 focus-within:shadow-2xl focus-within:border-primary/20 backdrop-blur-md">
-            <Button variant="ghost" size="icon" className="rounded-full text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 h-10 w-10">
-              <FileUp className="w-5 h-5" />
-            </Button>
-            
-            <input
-              type="text"
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && !isOffline && sendMessage(inputText)}
-              disabled={isOffline}
-              placeholder={
-                isOffline
-                  ? "Backend offline..."
-                  : agentState === "listening"
-                  ? "Say something..."
-                  : "Message Jarvis..."
-              }
-              className="flex-1 bg-transparent px-4 py-2 text-[14px] focus:outline-none placeholder:text-muted-foreground/50 font-inter disabled:opacity-50"
-            />
-
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="icon"
-                disabled={isOffline}
-                className="rounded-full text-muted-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 h-10 w-10 disabled:opacity-40"
-                onClick={toggleMic}
-              >
-                <Mic className="w-5 h-5" />
-              </Button>
-              <Button 
-                onClick={() => sendMessage(inputText)}
-                disabled={isOffline || !inputText.trim()}
-                className="bg-primary text-primary-foreground rounded-full h-10 w-10 p-0 shadow-lg hover:bg-cyan-800 dark:hover:bg-cyan-300 disabled:opacity-30 disabled:hover:bg-primary transition-all active:scale-95"
-              >
-                <SendHorizontal className="w-5 h-5" />
-              </Button>
-            </div>
-          </div>
+        <div className="flex w-full items-center gap-2 rounded-2xl border border-white/50 bg-white/70 p-1.5 shadow-sm backdrop-blur-md dark:border-zinc-700/50 dark:bg-zinc-900/70">
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && !isOffline && sendMessage(inputText)}
+            disabled={isOffline}
+            placeholder={isOffline ? "Offline..." : "Message Jarvis..."}
+            className="min-w-0 flex-1 bg-transparent px-3 py-2 text-[13px] outline-none placeholder:text-muted-foreground/50 disabled:opacity-50"
+          />
+          <Button
+            onClick={() => sendMessage(inputText)}
+            disabled={isOffline || !inputText.trim()}
+            className="h-9 w-9 shrink-0 rounded-xl bg-primary p-0 text-primary-foreground shadow-sm hover:bg-cyan-800 disabled:opacity-30 dark:hover:bg-cyan-300"
+          >
+            <SendHorizontal className="h-4 w-4" />
+          </Button>
         </div>
-        <p className="text-[10px] text-center text-muted-foreground/40 mt-3 font-inter">
-          Jarvis v2.4 powered by ElevenLabs & Groq LPU
-        </p>
       </div>
     </div>
   );

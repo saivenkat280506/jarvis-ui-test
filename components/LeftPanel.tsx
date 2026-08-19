@@ -4,11 +4,12 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { AgentState } from "@/components/ui/orb";
 import { Waveform } from "@/components/ui/waveform";
-import { Mic, MicOff, Settings2, ShieldCheck, WifiOff, Zap } from "lucide-react";
+import { Mic, MicOff, Settings2, WifiOff, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { mapAgentToOrb } from "@/lib/types";
 import CrystalOrbHud from "@/components/jarvis/CrystalOrbHud";
+import OrbAura from "@/components/jarvis/OrbAura";
 
 const CrystalOrb = dynamic(() => import("@/components/jarvis/CrystalOrb"), {
   ssr: false,
@@ -20,7 +21,6 @@ interface LeftPanelProps {
   isBackendOnline?: boolean;
   toggleMic: () => void;
   speechTranscript: string;
-  onSettingsClick: () => void;
 }
 
 export default function LeftPanel({ 
@@ -29,7 +29,6 @@ export default function LeftPanel({
   isBackendOnline = true,
   toggleMic,
   speechTranscript,
-  onSettingsClick
 }: LeftPanelProps) {
   const [isDark, setIsDark] = useState(false);
 
@@ -61,24 +60,10 @@ export default function LeftPanel({
 
   const statusDot = isOffline ? "bg-red-500" : "bg-emerald-500 animate-pulse";
 
-  const subtitle = isOffline
-    ? "Backend unreachable — start Jarvis backend"
-    : isListening
-    ? "Listening to your request..."
-    : agentState === "idle_listening"
-    ? "On call — speak your next command"
-    : agentState === "talking"
-    ? "Speaking..."
-    : agentState === "thinking"
-    ? "Processing..."
-    : agentState === "transcribing"
-    ? "Transcribing..."
-    : "Click to start voice call";
-
   return (
-    <aside className="w-[340px] glass rounded-3xl flex flex-col h-full shadow-sm overflow-hidden p-6 gap-6">
-      {/* HEADER SECTION */}
-      <div className="flex items-center justify-between">
+    <aside className="relative flex h-full w-[80%] min-w-0 flex-col overflow-hidden rounded-3xl p-6 shadow-sm glass">
+      <div className="orb-grid pointer-events-none absolute inset-0 rounded-3xl" />
+      <div className="relative z-10 flex items-center">
         <div className="flex items-center gap-2">
           <div className={cn("w-2 h-2 rounded-full", statusDot)} />
           <span className={cn(
@@ -88,48 +73,30 @@ export default function LeftPanel({
             {statusLabel}
           </span>
         </div>
-        <Button variant="ghost" size="icon" onClick={onSettingsClick} className="rounded-full hover:bg-white/50 dark:hover:bg-zinc-800/50">
-          <Settings2 className="w-4 h-4 text-muted-foreground" />
-        </Button>
       </div>
 
-      {/* ORB AREA - Centered ice wreath */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-4">
-        <div className="relative aspect-square w-full max-w-[248px] orb-float">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+        <div className="relative aspect-square w-[min(68%,78vh)] orb-float">
+          <OrbAura state={mapAgentToOrb(agentState)} />
           <div className="orb-well" />
           <CrystalOrb state={mapAgentToOrb(agentState)} />
           <CrystalOrbHud state={mapAgentToOrb(agentState)} />
         </div>
+      </div>
 
-        <div className="text-center space-y-1">
-          <h2 className="font-[family-name:var(--font-display)] text-xl font-medium tracking-[0.28em] text-zinc-900 dark:text-zinc-100">
-            J.A.R.V.I.S
-          </h2>
-          <p className={cn(
-            "text-xs font-inter italic px-4",
-            isOffline ? "text-red-500/70" : "text-muted-foreground"
-          )}>
-            {subtitle}
-          </p>
-        </div>
-
-        {/* INTEGRATED WAVEFORM */}
-        <div className="w-full h-12 flex items-center justify-center px-4">
-          <Waveform 
-            data={waveformData} 
-            barWidth={3} 
-            barGap={2} 
-            barRadius={10}
+      <div className="relative z-10 mx-auto mt-auto flex w-full max-w-[200px] flex-col items-center gap-3 pb-1">
+        <div className="flex h-8 w-40 items-center justify-center">
+          <Waveform
+            data={waveformData}
+            barWidth={2}
+            barGap={2}
+            barRadius={8}
             fadeEdges={true}
-            height={40}
-            className="w-full h-full opacity-60"
+            height={28}
+            className="h-full w-full opacity-60"
             barColor={isDark ? "#22d3ee" : "#0e7490"}
           />
         </div>
-      </div>
-
-      {/* FOOTER SECTION - Glass Control */}
-      <div className="flex flex-col gap-4">
         {(speechTranscript || agentState === "thinking" || agentState === "transcribing") && (
           <div className="p-3 bg-white/40 dark:bg-zinc-800/40 border border-white/60 dark:border-zinc-700/60 rounded-2xl animate-in fade-in slide-in-from-bottom-2">
             <p className="text-[13px] text-foreground leading-snug line-clamp-2 italic font-inter opacity-80">
@@ -165,27 +132,16 @@ export default function LeftPanel({
               onClick={toggleMic}
               disabled={isOffline}
               className={cn(
-                "w-full h-14 rounded-2xl transition-all duration-500 gap-3 border-none shadow-md font-medium text-white dark:text-slate-950",
+                "h-9 w-[168px] rounded-xl gap-2 border-none px-3 text-xs shadow-sm font-medium text-white dark:text-slate-950",
                 inSession || isOffline ? config.color : "bg-primary hover:bg-cyan-800 dark:hover:bg-cyan-300",
                 isOffline && "opacity-80 cursor-not-allowed"
               )}
             >
-              <Icon className={cn("w-5 h-5", agentState === "listening" && "animate-pulse")} />
+              <Icon className={cn("h-3.5 w-3.5", agentState === "listening" && "animate-pulse")} />
               <span>{label}</span>
             </Button>
           );
         })()}
-
-        <div className="grid grid-cols-2 gap-2 text-[10px] text-muted-foreground font-jetbrains pt-2">
-          <div className="flex items-center gap-1.5 p-2 rounded-xl bg-white/30 dark:bg-zinc-800/30 border border-white/40 dark:border-zinc-700/40">
-            <ShieldCheck className="w-3 h-3 text-emerald-500" />
-            <span className="dark:text-zinc-300">SECURE</span>
-          </div>
-          <div className="flex items-center gap-1.5 p-2 rounded-xl bg-white/30 dark:bg-zinc-800/30 border border-white/40 dark:border-zinc-700/40">
-            <Zap className="w-3 h-3 text-amber-500" />
-            <span className="dark:text-zinc-300">v2.4.0</span>
-          </div>
-        </div>
       </div>
     </aside>
   );

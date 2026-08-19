@@ -5,13 +5,12 @@ import LeftPanel from "@/components/LeftPanel";
 import ChatArea from "@/components/ChatArea";
 import QuickActions from "@/components/QuickActions";
 import AgentStepTracker from "@/components/AgentStepTracker";
-import SettingsSheet from "@/components/SettingsSheet";
 import { useJarvis } from "@/hooks/useJarvis";
 import { useTheme } from "@/hooks/useTheme";
 
 export default function JarvisWorkspace() {
   const jarvis = useJarvis();
-  const { theme, setTheme, toggleTheme } = useTheme();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <main className="relative flex h-screen w-screen overflow-hidden bg-background p-4 gap-4">
@@ -24,12 +23,10 @@ export default function JarvisWorkspace() {
         isBackendOnline={jarvis.isBackendOnline}
         toggleMic={jarvis.toggleMic}
         speechTranscript={jarvis.speechTranscript}
-        onSettingsClick={() => jarvis.setSettingsOpen(true)}
       />
 
-      <div className="relative flex min-w-0 flex-1 flex-col gap-4">
+      <div className="relative flex h-full w-[20%] min-w-0 flex-col gap-3">
         <TopBar
-          onSettingsClick={() => jarvis.setSettingsOpen(true)}
           onRefreshChat={jarvis.clearChat}
           backendStatus={jarvis.backendStatus}
           backendLatency={jarvis.backendLatency}
@@ -59,12 +56,6 @@ export default function JarvisWorkspace() {
         </div>
       </div>
 
-      <SettingsSheet
-        open={jarvis.settingsOpen}
-        onOpenChange={jarvis.setSettingsOpen}
-        theme={theme}
-        onThemeChange={setTheme}
-      />
     </main>
   );
 }
