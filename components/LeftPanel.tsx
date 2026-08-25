@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { mapAgentToOrb } from "@/lib/types";
 import CrystalOrbHud from "@/components/jarvis/CrystalOrbHud";
-import OrbAura from "@/components/jarvis/OrbAura";
 
 const CrystalOrb = dynamic(() => import("@/components/jarvis/CrystalOrb"), {
   ssr: false,
@@ -77,9 +76,9 @@ export default function LeftPanel({
 
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
         <div className="relative aspect-square w-[min(68%,78vh)] orb-float">
-          <OrbAura state={mapAgentToOrb(agentState)} />
-          <div className="orb-well" />
-          <CrystalOrb state={mapAgentToOrb(agentState)} />
+          <div className="orb-stage">
+            <CrystalOrb state={mapAgentToOrb(agentState)} />
+          </div>
           <CrystalOrbHud state={mapAgentToOrb(agentState)} />
         </div>
       </div>

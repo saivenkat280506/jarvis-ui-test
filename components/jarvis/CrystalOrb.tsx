@@ -6,11 +6,13 @@ import { Float } from "@react-three/drei";
 import * as THREE from "three";
 import type { OrbVisualState } from "@/lib/types";
 
+// Jarvis-chat Orb.jsx shaders + view-space normals so the low-poly
+// icosahedron reads as the ice wreath from Screenshot (86).
 const vertexShader = `
   uniform float uTime;
   uniform float uIntensity;
-  varying vec2 vUv;
   varying float vDisplacement;
+  varying vec3 vViewNormal;
 
   vec3 mod289(vec3 x) {
     return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -89,48 +91,48 @@ const vertexShader = `
   }
 
   void main() {
-    vUv = uv;
     vec3 pos = position;
-
     float noise1 = snoise(pos * 1.5 + uTime * 0.3);
     float noise2 = snoise(pos * 3.0 + uTime * 0.5);
     float noise3 = snoise(pos * 5.0 + uTime * 0.7);
-
     float displacement = (noise1 * 0.5 + noise2 * 0.25 + noise3 * 0.125) * uIntensity;
     vDisplacement = displacement;
-
     pos += normal * displacement;
-
+    vViewNormal = normalize(normalMatrix * normal);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
   }
 `;
 
 const fragmentShader = `
-  uniform float uTime;
   uniform vec3 uColor;
   uniform float uOpacity;
-  varying vec2 vUv;
   varying float vDisplacement;
+  varying vec3 vViewNormal;
 
   void main() {
-    float fresnel = pow(1.0 - abs(dot(normalize(vec3(0.0, 0.0, 1.0)), vec3(0.0, 0.0, 1.0))), 2.0);
-    float glow = fresnel * 0.8 + vDisplacement * 0.5;
-    vec3 color = uColor + vec3(0.2, 0.4, 0.6) * glow;
-    float alpha = (0.3 + fresnel * 0.4 + glow * 0.3) * uOpacity;
-    gl_FragColor = vec4(color, alpha);
+    vec3 n = normalize(vViewNormal);
+    float facing = abs(n.z);
+    float fresnel = pow(1.0 - facing, 2.4);
+    float ridge = abs(vDisplacement) * 2.4;
+    vec3 ice = uColor * (0.42 + facing * 0.58);
+    vec3 rim = vec3(0.70, 0.96, 1.0);
+    vec3 color = ice + rim * (fresnel * 0.95 + ridge * 0.32);
+    float alpha = (0.16 + facing * 0.20 + fresnel * 0.58 + ridge * 0.22) * uOpacity;
+    gl_FragColor = vec4(color, clamp(alpha, 0.0, 1.0));
   }
 `;
 
+// Jarvis-chat Orb.jsx values. Offline is sandbox-only.
 const INTENSITY_MAP: Record<OrbVisualState, number> = {
-  idle: 0.34,
-  listening: 0.48,
-  thinking: 0.62,
-  talking: 0.52,
-  offline: 0.14,
+  idle: 0.18,
+  listening: 0.32,
+  thinking: 0.48,
+  talking: 0.38,
+  offline: 0.1,
 };
 
 const COLOR_MAP: Record<OrbVisualState, THREE.Color> = {
-  idle: new THREE.Color("#4dd0e1"),
+  idle: new THREE.Color("#2ec4d6"),
   listening: new THREE.Color("#6ee7ff"),
   thinking: new THREE.Color("#49b3ff"),
   talking: new THREE.Color("#8cefff"),
@@ -146,7 +148,7 @@ function OrbMesh({ state }: { state: OrbVisualState }) {
       uTime: { value: 0 },
       uIntensity: { value: INTENSITY_MAP[state] },
       uColor: { value: COLOR_MAP[state].clone() },
-      uOpacity: { value: state === "offline" ? 0.55 : 0.85 },
+      uOpacity: { value: state === "offline" ? 0.5 : 0.92 },
     }),
     // created once; state is lerped in useFrame
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -162,7 +164,7 @@ function OrbMesh({ state }: { state: OrbVisualState }) {
       material.uniforms.uIntensity.value +=
         (targetIntensity - material.uniforms.uIntensity.value) * 0.05;
       material.uniforms.uColor.value.lerp(COLOR_MAP[state], 0.03);
-      const targetOpacity = state === "offline" ? 0.55 : 0.85;
+      const targetOpacity = state === "offline" ? 0.5 : 0.92;
       material.uniforms.uOpacity.value +=
         (targetOpacity - material.uniforms.uOpacity.value) * 0.06;
     }
@@ -173,15 +175,21 @@ function OrbMesh({ state }: { state: OrbVisualState }) {
     }
   });
 
+  const geometry = useMemo(() => {
+    const geometry = new THREE.IcosahedronGeometry(1.64, 3);
+    geometry.computeVertexNormals();
+    return geometry;
+  }, []);
+
   return (
-    <mesh ref={meshRef}>
-      <icosahedronGeometry args={[1.85, 6]} />
+    <mesh ref={meshRef} geometry={geometry}>
       <shaderMaterial
         ref={materialRef}
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         uniforms={uniforms}
         transparent
+        toneMapped={false}
         side={THREE.DoubleSide}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
@@ -213,8 +221,8 @@ function Particles() {
       nextPositions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
       nextPositions[i * 3 + 2] = radius * Math.cos(phi);
 
-      nextColors[i * 3] = 0.3 + rand() * 0.3;
-      nextColors[i * 3 + 1] = 0.8 + rand() * 0.2;
+      nextColors[i * 3] = 0.55 + rand() * 0.45;
+      nextColors[i * 3 + 1] = 0.82 + rand() * 0.18;
       nextColors[i * 3 + 2] = 0.9 + rand() * 0.1;
     }
 
@@ -235,12 +243,14 @@ function Particles() {
         <bufferAttribute attach="attributes-color" args={[colors, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.025}
+        size={0.022}
         vertexColors
         transparent
-        opacity={0.5}
+        toneMapped={false}
+        opacity={0.55}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
+        sizeAttenuation
       />
     </points>
   );
@@ -257,8 +267,8 @@ function Ring({ speed }: { speed: number }) {
 
   return (
     <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
-      <torusGeometry args={[2.8, 0.015, 16, 100]} />
-      <meshBasicMaterial color="#4dd0e1" transparent opacity={0.25} />
+      <torusGeometry args={[2.8, 0.012, 16, 100]} />
+      <meshBasicMaterial color="#4dd0e1" transparent opacity={0.22} toneMapped={false} />
     </mesh>
   );
 }
@@ -302,13 +312,13 @@ export default function CrystalOrb({
         dpr={[1, 1.75]}
         gl={{
           antialias: true,
-          alpha: true,
-          premultipliedAlpha: true,
+          alpha: false,
           preserveDrawingBuffer: true,
         }}
-        style={{ background: "transparent" }}
         onCreated={({ gl }) => {
           glRef.current = gl;
+          gl.toneMapping = THREE.NoToneMapping;
+          gl.setClearColor("#04070d", 1);
         }}
       >
         <Float speed={2} rotationIntensity={0.2} floatIntensity={0.3}>

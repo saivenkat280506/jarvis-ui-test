@@ -268,34 +268,19 @@
   opacity: 0.045;
 }
 
-.orb-well {
+.orb-stage {
   position: absolute;
-  inset: 6%;
+  inset: 7%;
+  z-index: 0;
+  overflow: hidden;
   border-radius: 9999px;
-  background: radial-gradient(
-    circle at 50% 46%,
-    #07141e 0%,
-    #0b1a26 50%,
-    rgba(7, 20, 30, 0.42) 64%,
-    transparent 74%
-  );
-  box-shadow:
-    0 0 80px rgba(8, 145, 178, 0.14),
-    inset 0 0 50px rgba(8, 145, 178, 0.08);
+  background: #04070d;
+  box-shadow: 0 0 80px rgba(14, 116, 144, 0.22);
   pointer-events: none;
 }
 
-.dark .orb-well {
-  background: radial-gradient(
-    circle at 50% 46%,
-    #02080e 0%,
-    #061018 52%,
-    rgba(2, 8, 14, 0.2) 68%,
-    transparent 76%
-  );
-  box-shadow:
-    0 0 90px rgba(34, 211, 238, 0.16),
-    inset 0 0 60px rgba(34, 211, 238, 0.08);
+.dark .orb-stage {
+  box-shadow: 0 0 90px rgba(34, 211, 238, 0.16);
 }
 
 .orb-scan {
@@ -308,9 +293,10 @@
   background: linear-gradient(
     90deg,
     transparent,
-    rgba(125, 241, 255, 0.85),
+    rgba(186, 242, 255, 0.95),
     transparent
   );
   box-shadow: 0 0 18px rgba(125, 241, 255, 0.55);
-  opacity: 0.55;
+  opacity: 0.7;
+  z-index: 2;
 }
